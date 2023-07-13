@@ -8,19 +8,37 @@
 import SwiftUI
 
 struct ContentView: View {
+    @ObservedObject var viewModel = UserViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        GeometryReader { geometry in
+            if case .LOADING = viewModel.currentState {
+                loaderView()
+            } else if case .SUCCESS(let users) = viewModel.currentState {
+                List(users) { user in
+                    userCell(user: user)
+                        .frame(width: geometry.size.width, height: 80)
+                }
+            } else if case .FAILURE(let error) = viewModel.currentState {
+                VStack(alignment: .center) {
+                    Spacer()
+                    Text(error)
+                        .font(.headline.bold())
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                }
+                .padding()
+            }
         }
-        .padding()
     }
 }
+        
 
+        
+      
+        
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+                ContentView()
+        }
     }
-}
